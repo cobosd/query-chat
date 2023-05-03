@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Query GPT</title>
+    <style>
+      /* Add custom styles here */
+      .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        /* background-color: #8d5cf6; */
+        width: 100%;
+      }
+      header {
+        background: linear-gradient(to bottom right, #8d5cf6, #6c208d);
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        /* position: fixed; */
+        width: 100%;
+        height: 400px;
+        top: 0;
+        left: 0;
+      }
+      h1 {
+        margin: 0;
+        font-size: 3rem;
+        font-weight: bold;
+      }
+      .container {
+        width: 95%;
+        margin: 0 auto;
+        padding: 100px 20px;
+        text-align: center;
+        display: inline-block;
+        /* background-color: #25c171; */
+      }
+      p {
+        font-size: 1.5rem;
+        line-height: 2;
+      }
+      button {
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        background-color: #333;
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      button:hover {
+        background-color: #2ced89;
+        color: #333;
+      }
+      form {
+        /* display: inline-block; */
+        display: grid;
+      }
+      input[type="text"] {
+        padding: 20px;
+        width: 500px;
+        font-size: 1.2rem;
+        margin-block: 10px;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 0 20px rgba(92, 92, 92, 0.222);
+        height: 100px;
+      }
+      textarea {
+        padding: 20px;
+        width: 50%;
+        font-size: 1.2rem;
+        margin-block: 10px;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 0 20px rgba(92, 92, 92, 0.222);
+        min-height: 100px;
+        outline: none;
+      }
+      input[type="submit"] {
+        border-radius: 35px;
+        width: 50%;
+        height: 50px;
+        background-color: #333333;
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.2s ease-in-out;
+      }
+      input[type="submit"]:hover {
+        background-color: #2ced89;
+        color: #333;
+      }
+
+      #completed_text {
+        background-color: #444654;
+        color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(92, 92, 92, 0.522);
+        padding: 20px;
+        font-size: 16px;
+        line-height: 1.4;
+        margin-bottom: 20px;
+        font-size: 1rem;
+        width: 50%;
+      }
+      .upload_field input.wpcf7-file::-webkit-file-upload-button {
+        border-radius: 35px;
+        width: 50%;
+        min-height: 35px;
+        background-color: #333333;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        background: linear-gradient(45deg, #8249d4, #b17ff6);
+        cursor: pointer;
+      }
+      .upload_field input.wpcf7-file::-webkit-file-upload-button:hover {
+        background: rgba(39, 203, 119, 1);
+      }
+      .upload_field input.wpcf7-file::-webkit-file-upload-button:focus {
+        outline: none;
+      }
+      .upload_field input.wpcf7-file:focus {
+        outline: none;
+      }
+      .upload_field {
+        margin-bottom: 20px;
+        padding-left: 5px;
+        border: 1px solid #e6e6e6;
+        padding: 15px 10px 25px;
+        border-radius: 20px;
+      }
+      #remove-csv-button {
+        background-color: #d9534f; /* Set the background color to red */
+        color: #fff; /* Set the text color to white */
+        border: none; /* Remove the border */
+        padding: 8px 16px; /* Add some padding to the button */
+        font-size: 16px; /* Set the font size */
+        cursor: pointer; /* Add a cursor pointer */
+        margin-top: 10px; /* Add some margin at the top of the button */
+        display: none;
+      }
+      #upload-form {
+        width: 50%;
+        display: inline-block;
+        justify-items: center;
+      }
+      #text-form {
+        width: 100%;
+        display: inline-block;
+        justify-items: center;
+      }
+
+      #csv-upload-button {
+        border-radius: 35px;
+        width: 30%;
+        min-height: 35px;
+        background-color: #333333;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.2s ease-in-out;
+      }
+      #csv-upload-button:hover {
+        border-radius: 35px;
+        width: 30%;
+        min-height: 35px;
+        background-color: #2ced89;
+        color: #3b3a3a;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.2s ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="center">
+      <h1>Query GPT</h1>
+    </header>
+    <script>
+      window.onload = function () {
+        console.log("loading");
+
+        if (sessionStorage.getItem("csvData")) {
+          console.log("loading 2");
+          // simulate a click on the submit button of the form
+          var form = document.querySelector("form");
+          var submitButton = form.querySelector('button[type="submit"]');
+          submitButton.click();
+        }
+      };
+    </script>
+    <div class="container">
+      <form
+        id="upload-form"
+        enctype="multipart/form-data"
+        onsubmit="addToSession(event)"
+      >
+        <div class="upload_field">
+          <!-- <label
+            >Please Upload Your CSV File.<br /> -->
+          <span class="wpcf7-form-control-wrap file-874">
+            <input
+              type="file"
+              name="file"
+              size="40"
+              class="wpcf7-form-control wpcf7-file"
+              accept=".csv"
+              aria-invalid="false"
+              onchange="handleFileInputChange(event)"
+            />
+          </span>
+          <!-- </label> -->
+          <!-- <button
+            id="csv-upload-button"
+            type="button"
+            onclick="uploadFile(event)"
+          >
+            Submit
+          </button> -->
+        </div>
+      </form>
+      <button id="remove-csv-button" type="button" onclick="removeCSV()">
+        Remove CSV
+      </button>
+      <script>
+        let selectedFile;
+
+        function handleFileInputChange(event) {
+          selectedFile = event.target.files[0];
+          uploadFile(selectedFile);
+        }
+        function addToSession(event) {
+          console.log("addToSession");
+
+          sessionStorage.setItem("csvData", event); // save the variable to local storage
+        }
+
+        function uploadFile(event) {
+          console.log("uploading file");
+
+          if (!selectedFile) {
+            alert("Please select a file.");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", selectedFile);
+
+          fetch("/uploadfile", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              // Do something with the response data
+            })
+            .catch((error) => {
+              console.error(error);
+              // Handle the error
+            });
+
+          document.getElementById("remove-csv-button").style.display =
+            "inline-block";
+          document.getElementById("upload-form").style.display = "none";
+        }
+
+        async function removeCSV() {
+          await fetch("/deletefile")
+            .then((response) => response.json())
+            .then((data) => console.log(data));
+
+          // Clear the value of the file input element
+          document.querySelector('input[type="file"]').value = "";
+          // Hide the "Remove CSV" button
+          document.getElementById("remove-csv-button").style.display = "none";
+          // Show the "Please Upload Your CSV File" label and the "Submit" button
+          document.getElementById("upload-form").style.display = "inline-block";
+          sessionStorage.setItem("csvData", null);
+          console.log("File removed. FILE:", sessionStorage.getItem("csvData"));
+        }
+      </script>
+      <form id="text-form" onsubmit="sendRequest(event)">
+        <textarea
+          id="prompt"
+          name="prompt"
+          wrap="soft"
+          placeholder="What would you like to know?"
+        ></textarea>
+        <input type="submit" value="Get Response" />
+      </form>
+      <p id="completed_text" class="center" style="display: none"></p>
+    </div>
+    <!-- <button type="button" onclick="getData()">Get Data</button> -->
+    <script>
+      async function sendRequest(event) {
+        event.preventDefault();
+
+        var form = document.getElementById("text-form");
+        var submitButton = form.querySelector('input[type="submit"]');
+        submitButton.value = "Generating response";
+        submitButton.disabled = true;
+
+        document.getElementById("completed_text").style.display = "none";
+
+        const prompt = document.getElementById("prompt").value;
+
+        res = await fetch("/getdata");
+
+        fileName = await res.json();
+
+        const response = await fetch("/complete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: prompt,
+            max_tokens: 350,
+            filename: fileName.message,
+          }),
+        });
+        const data = await response.json();
+        console.log(data.answer);
+
+        const completedText = document.getElementById("completed_text");
+        completedText.textContent = data.answer;
+        completedText.style.display = "inline-block"; // or "block" if necessary
+        submitButton.value = "Get Response";
+        submitButton.disabled = false;
+      }
+    </script>
+  </body>
+</html>
