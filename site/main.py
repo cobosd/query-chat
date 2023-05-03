@@ -21,7 +21,7 @@ import csv
 
 # Initialization
 app = FastAPI()
-templates = Jinja2Templates(directory="app/templates/")
+templates = Jinja2Templates(directory="templates/")
 
 # Load environment variables from .env file
 load_dotenv()
