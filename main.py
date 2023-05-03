@@ -13,6 +13,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import openai
 import pandas as pd
+import uvicorn
 import os
 import csv
 
@@ -127,5 +128,5 @@ def get_current_time():
   return {"time": datetime.now()}
 
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
