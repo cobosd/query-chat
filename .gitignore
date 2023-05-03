@@ -1,0 +1,24 @@
+# ignore build artifacts
+build/
+dist/
+*.pyc
+
+# ignore virtual environments and env variables
+venv/
+env/
+.virtualenv/
+.vscode/
+.env
+.env/
+
+# ignore user-specific files
+.DS_Store
+.idea/
+*.log
+*.bak
+*.swp
+*.swo
+
+# ignore project-specific files
+config.py
+db.sqlite3
