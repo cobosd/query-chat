@@ -246,12 +246,12 @@
         }
         function addToSession(event) {
           console.log("addToSession");
-
-          sessionStorage.setItem("csvData", event); // save the variable to local storage
+          // sessionStorage.setItem("csvData", event); // save the variable to local storage
         }
 
         function uploadFile(event) {
           console.log("uploading file");
+          sessionStorage.setItem("csvData", event); // save the variable to local storage
 
           if (!selectedFile) {
             alert("Please select a file.");
@@ -311,38 +311,42 @@
       async function sendRequest(event) {
         event.preventDefault();
 
-        var form = document.getElementById("text-form");
-        var submitButton = form.querySelector('input[type="submit"]');
-        submitButton.value = "Generating response";
-        submitButton.disabled = true;
+        if (sessionStorage.getItem("csvData")) {
+          var form = document.getElementById("text-form");
+          var submitButton = form.querySelector('input[type="submit"]');
+          submitButton.value = "Generating response";
+          submitButton.disabled = true;
 
-        document.getElementById("completed_text").style.display = "none";
+          document.getElementById("completed_text").style.display = "none";
 
-        const prompt = document.getElementById("prompt").value;
+          const prompt = document.getElementById("prompt").value;
 
-        res = await fetch("/getdata");
+          res = await fetch("/getdata");
 
-        fileName = await res.json();
+          fileName = await res.json();
 
-        const response = await fetch("/complete", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            question: prompt,
-            max_tokens: 350,
-            filename: fileName.message,
-          }),
-        });
-        const data = await response.json();
-        console.log(data.answer);
+          const response = await fetch("/complete", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              question: prompt,
+              max_tokens: 350,
+              filename: fileName.message,
+            }),
+          });
+          const data = await response.json();
+          console.log(data.answer);
 
-        const completedText = document.getElementById("completed_text");
-        completedText.textContent = data.answer;
-        completedText.style.display = "inline-block"; // or "block" if necessary
-        submitButton.value = "Get Response";
-        submitButton.disabled = false;
+          const completedText = document.getElementById("completed_text");
+          completedText.textContent = data.answer;
+          completedText.style.display = "inline-block"; // or "block" if necessary
+          submitButton.value = "Get Response";
+          submitButton.disabled = false;
+        } else {
+          alert("Please add a CSV file");
+        }
       }
     </script>
   </body>
