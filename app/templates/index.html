@@ -185,6 +185,81 @@
         border: none;
         transition: background-color 0.2s ease-in-out;
       }
+      #warning-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-container {
+        width: 500px;
+        border-radius: 10px;
+        background-color: #f2f2f2;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #8d5cf6;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        color: #fff;
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .close-button {
+        border: none;
+        background-color: transparent;
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      .close-button:hover {
+        color: #f2f2f2;
+      }
+
+      .modal-body {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .modal-body p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+      }
+
+      .modal-body button {
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        background-color: #333;
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      .modal-body button:hover {
+        background-color: #2ced89;
+        color: #333;
+      }
     </style>
   </head>
   <body>
@@ -203,6 +278,13 @@
           submitButton.click();
         }
       };
+
+      window.addEventListener("beforeunload", async function (event) {
+        // Call the API endpoint using the fetch() function
+        await fetch("/deletefile")
+          .then((response) => response.json())
+          .then((data) => console.log(data));
+      });
     </script>
     <div class="container">
       <form
@@ -305,6 +387,18 @@
         <input type="submit" value="Get Response" />
       </form>
       <p id="completed_text" class="center" style="display: none"></p>
+      <div id="warning-modal">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h2>Warning</h2>
+            <button class="close-button" onclick="hideModal()">X</button>
+          </div>
+          <div class="modal-body">
+            <p>Please upload a CSV file before submitting your question.</p>
+            <button onclick="hideModal()">OK</button>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- <button type="button" onclick="getData()">Get Data</button> -->
     <script>
@@ -345,8 +439,15 @@
           submitButton.value = "Get Response";
           submitButton.disabled = false;
         } else {
-          alert("Please add a CSV file");
+          // show the warning modal
+          const modal = document.getElementById("warning-modal");
+          modal.style.display = "block";
         }
+      }
+      function hideModal() {
+        // hide the warning modal
+        const modal = document.getElementById("warning-modal");
+        modal.style.display = "none";
       }
     </script>
   </body>
