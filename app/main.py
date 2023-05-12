@@ -1,9 +1,9 @@
 
 # components
 # from utils import QdrantVectorstore
-from chain import load_agent, sql_agent
-from fileConversion import csv_types
-from preprocessing import csv_to_db
+from app.chain import load_agent, sql_agent
+from app.fileConversion import csv_types
+from app.preprocessing import csv_to_db
 import shutil
 
 
