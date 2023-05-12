@@ -1,8 +1,9 @@
 
 # components
 # from utils import QdrantVectorstore
-from app.chain import load_agent
+from app.chain import load_agent, sql_agent
 from app.fileConversion import csv_types
+from app.preprocessing import csv_to_db
 import shutil
 
 
@@ -36,7 +37,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 uploaded_data_list = []
-csv_file_path = []
+db_file_path = []
 dataframe = pd.DataFrame()
 
 # API endpoints
@@ -51,23 +52,36 @@ async def home(request: Request):
 
 @app.post('/complete')
 async def complete_text(request: Request):
-
     # Retrieve request data
     data = await request.json()
+    print(data)
+    modelSelected = int(data['modelSelected'])
 
-    dataframe = csv_types(data["filename"])
+    # dataframe = csv_to_db(data["filename"])
 
-    agent = load_agent(dataframe)
+    agent = sql_agent(data['filename'], modelSelected)
 
-    output = agent.run(data["question"])
+    try:
+        if modelSelected == 1:
+            output = agent(data["question"])
+            return {'answer': output['result']}
 
-    return {'answer': output}
+        elif modelSelected == 2:
+            output = agent.run(data["question"])
+            return {'answer': output}
+
+    except ValueError as e:
+        # # HACK: https://github.com/hwchase17/langchain/issues/1358#issuecomment-1486132587
+        # response = str(e)
+        # if not response.startswith("Could not parse LLM output: `"):
+        #     raise e
+        # response = response.removeprefix(
+        #     "Could not parse LLM output: `").removesuffix("`")
+        return
 
 
 @app.post("/uploadfile")
 async def upload_csv_file(file: UploadFile = File(...)):
-    print('FILE:', file)
-
     if not file.filename.endswith('.csv'):
         return {"error": "Invalid file format"}
 
@@ -75,40 +89,38 @@ async def upload_csv_file(file: UploadFile = File(...)):
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+        new_file_path = csv_to_db(file_path)
 
-    with open(file_path, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file)
+    # with open(new_file_path, 'r') as db_file:
+    if len(db_file_path) != 0:
+        db_file_path.pop()
 
-        if len(csv_file_path) != 0:
-            csv_file_path.pop()
+    db_file_path.append(new_file_path)
 
-        csv_file_path.append(file_path)
-
-        for row in csv_reader:
-            uploaded_data_list.append(row)
-
-    return {"status": "File uploaded successfully"}
+    return {"status": "File uploaded successfully", "path": new_file_path}
 
 
 @app.get("/deletefile")
 async def delete_csv_file():
 
     try:
-        if len(csv_file_path) != 0:
-            os.remove(str(csv_file_path[0]))
-            csv_file_path.pop()
-            print(f"{csv_file_path} successfully removed")
+        if len(db_file_path) != 0:
+            os.remove(str(db_file_path[0]))
+            db_file_path.pop()
+            print(f"{db_file_path} successfully removed")
     except OSError as e:
-        print(f"Error: {csv_file_path} - {e.strerror}")
+        print(f"Error: {db_file_path} - {e.strerror}")
 
-    print("DELETE?:", csv_file_path)
+    print("DELETE?:", db_file_path)
 
     return {"status": "File deleted successfully"}
+
+################################
 
 
 @app.get("/processdata")
 async def process_data():
-    print(csv_file_path)
+    print(db_file_path)
     # Here you can access the uploaded_data list
     for row in dataframe:
         print(row)
@@ -119,12 +131,12 @@ async def process_data():
 @app.get("/getdata")
 async def get_name():
 
-    if len(csv_file_path) == 0:
+    if len(db_file_path) == 0:
         print("No file uploaded")
         return {"message": None}
     else:
-        print(str(csv_file_path[0]))
-        return {"message": str(csv_file_path[0])}
+        print(str(db_file_path[0]))
+        return {"message": str(db_file_path[0])}
 
 
 @app.get("/time")

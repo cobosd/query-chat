@@ -62,8 +62,7 @@
         color: #333;
       }
       form {
-        /* display: inline-block; */
-        display: grid;
+        display: inline-block;
       }
       input[type="text"] {
         padding: 20px;
@@ -84,6 +83,18 @@
         border: none;
         box-shadow: 0 0 20px rgba(92, 92, 92, 0.222);
         min-height: 100px;
+        outline: none;
+      }
+      select {
+        padding: 20px;
+        width: 50%;
+        height: 50%;
+        font-size: 1.2rem;
+        margin-block: 20px;
+        border-radius: 20px;
+        border: none;
+        background-color: #f2f2f2;
+        box-shadow: 0 0 20px rgba(92, 92, 92, 0.362);
         outline: none;
       }
       input[type="submit"] {
@@ -271,7 +282,6 @@
         console.log("loading");
 
         if (sessionStorage.getItem("csvData")) {
-          console.log("loading 2");
           // simulate a click on the submit button of the form
           var form = document.querySelector("form");
           var submitButton = form.querySelector('button[type="submit"]');
@@ -287,11 +297,7 @@
       });
     </script>
     <div class="container">
-      <form
-        id="upload-form"
-        enctype="multipart/form-data"
-        onsubmit="addToSession(event)"
-      >
+      <form id="upload-form" enctype="multipart/form-data">
         <div class="upload_field">
           <!-- <label
             >Please Upload Your CSV File.<br /> -->
@@ -306,14 +312,6 @@
               onchange="handleFileInputChange(event)"
             />
           </span>
-          <!-- </label> -->
-          <!-- <button
-            id="csv-upload-button"
-            type="button"
-            onclick="uploadFile(event)"
-          >
-            Submit
-          </button> -->
         </div>
       </form>
       <button id="remove-csv-button" type="button" onclick="removeCSV()">
@@ -326,20 +324,11 @@
           selectedFile = event.target.files[0];
           uploadFile(selectedFile);
         }
-        function addToSession(event) {
-          console.log("addToSession");
-          // sessionStorage.setItem("csvData", event); // save the variable to local storage
-        }
-
         function uploadFile(event) {
-          console.log("uploading file");
-          sessionStorage.setItem("csvData", event); // save the variable to local storage
-
           if (!selectedFile) {
             alert("Please select a file.");
             return;
           }
-
           const formData = new FormData();
           formData.append("file", selectedFile);
 
@@ -349,7 +338,8 @@
           })
             .then((response) => response.json())
             .then((data) => {
-              console.log(data);
+              sessionStorage.setItem("csvData", data.path); // save the variable to local storage
+              console.log("SSS", sessionStorage);
               // Do something with the response data
             })
             .catch((error) => {
@@ -384,6 +374,10 @@
           wrap="soft"
           placeholder="What would you like to know?"
         ></textarea>
+        <select id="model-select" name="model" style="display: inline-flex">
+          <option value="1">Model 1</option>
+          <option value="2">Model 2</option>
+        </select>
         <input type="submit" value="Get Response" />
       </form>
       <p id="completed_text" class="center" style="display: none"></p>
@@ -406,6 +400,7 @@
         event.preventDefault();
 
         if (sessionStorage.getItem("csvData")) {
+          // print("SS", sessionStorage.getItem("csvData"));
           var form = document.getElementById("text-form");
           var submitButton = form.querySelector('input[type="submit"]');
           submitButton.value = "Generating response";
@@ -414,6 +409,9 @@
           document.getElementById("completed_text").style.display = "none";
 
           const prompt = document.getElementById("prompt").value;
+          const modelSelect = document.getElementById("model-select");
+          const modelSelected =
+            modelSelect.options[modelSelect.selectedIndex].value;
 
           res = await fetch("/getdata");
 
@@ -428,6 +426,7 @@
               question: prompt,
               max_tokens: 350,
               filename: fileName.message,
+              modelSelected: modelSelected,
             }),
           });
           const data = await response.json();
