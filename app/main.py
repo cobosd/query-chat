@@ -63,10 +63,12 @@ async def complete_text(request: Request):
 
     try:
         if modelSelected == 1:
+            print('model 1 selected')
             output = agent(data["question"])
             return {'answer': output['result']}
 
         elif modelSelected == 2:
+            print('model 2 selected')
             output = agent.run(data["question"])
             return {'answer': output}
 
