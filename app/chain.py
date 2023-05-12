@@ -25,6 +25,7 @@ def load_agent(file):
     load_dotenv()
     # Initialize OpenAI API key
     api_key = os.getenv('APP_OPENAI_KEY')
+
     # agent = create_csv_agent(OpenAI(temperature=0), file, verbose=True)
     agent = create_pandas_dataframe_agent(
         OpenAI(temperature=0, openai_api_key=api_key), file, verbose=True)
@@ -41,8 +42,13 @@ def sql_agent(file_path, model):
 
     # Initialize OpenAI API key
     api_key = os.getenv('APP_OPENAI_KEY')
+    print("API KEY IS:", api_key)
+
     llm = OpenAI(temperature=0, openai_api_key=api_key,
                  model_name="gpt-3.5-turbo")
+
+    print("OPENAI HAS BEEN INITIALIZED")
+
     db = SQLDatabase.from_uri(f"sqlite:///app/uploads/{file_name}")
 
     toolkit = SQLDatabaseToolkit(db=db, llm=llm, verbose=True)
