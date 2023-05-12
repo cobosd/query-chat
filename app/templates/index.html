@@ -414,8 +414,9 @@
             modelSelect.options[modelSelect.selectedIndex].value;
 
           res = await fetch("/getdata");
-
           fileName = await res.json();
+
+          console.log("fileName", fileName);
 
           const response = await fetch("/complete", {
             method: "POST",
