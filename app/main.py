@@ -223,20 +223,15 @@ def notify():
             whatsapp_string += f"Cidade: {game['city']}\n"
             whatsapp_string += f"Estádio: {game['stadium']}\n\n"
         
-        
-
-
-        # SEND WHATASPP MESSAGE
-        print(whatsapp_string) 
                     
-        account_sid = 'ACd4ea3137ad4f530b1100ac23910275db'
-        auth_token = '5d16764dc172c338716830654516d451'
+        account_sid = os.getenv('ACCOUNT_SID')
+        auth_token = os.getenv('WHATSAPP_TOKEN')
         client = Client(account_sid, auth_token)
                         
         message = client.messages.create(
-        from_='whatsapp:+14155238886',
+        from_='whatsapp:+'+os.getenv('FROM_NBR'),
         body=whatsapp_string,
-        to='whatsapp:+13863012225'
+        to='whatsapp:+'+os.getenv('PHONE_NBR')
         )
         whatsapp_string
         client = Courier(auth_token=courier_api)
