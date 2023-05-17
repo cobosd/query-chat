@@ -226,8 +226,11 @@ def notify():
                     
         account_sid = os.getenv('ACCOUNT_SID')
         auth_token = os.getenv('WHATSAPP_TOKEN')
+        
+        
         client = Client(account_sid, auth_token)
                         
+
         message = client.messages.create(
         from_='whatsapp:+'+os.getenv('FROM_NBR'),
         body=whatsapp_string,
