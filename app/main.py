@@ -5,7 +5,7 @@ from app.chain import load_agent, sql_agent
 from app.fileConversion import csv_types
 from app.preprocessing import csv_to_db
 import shutil
-
+import json
 
 # dependencies
 from fastapi import FastAPI, File, UploadFile, Request, HTTPException
@@ -56,8 +56,6 @@ async def complete_text(request: Request):
     data = await request.json()
     print(data)
     modelSelected = int(data['modelSelected'])
-
-    # dataframe = csv_to_db(data["filename"])
 
     agent = sql_agent(data['filename'], modelSelected)
 
@@ -132,7 +130,6 @@ async def process_data():
 
 @app.get("/getdata")
 async def get_name():
-
     if len(db_file_path) == 0:
         print("No file uploaded")
         return {"message": None}
@@ -144,6 +141,79 @@ async def get_name():
 @app.get("/time")
 def get_current_time():
     return {"time": datetime.now()}
+
+
+@app.get("/goldengoal/notify")
+def notify():
+    from trycourier import Courier
+    import psycopg2
+
+    receiver = 'dnazarioc@gmail.com'
+
+    # Database connection details
+    db_host = "goldengoal.ch4xk7wsawcj.us-east-1.rds.amazonaws.com"
+    db_port = 5432
+    # db_name = "postgres"
+    db_name = "goldengoal_db"
+    db_user = "postgres"
+    db_password = "vhq_5101"
+
+
+    def connect_to_database():
+        conn = psycopg2.connect(
+            host=db_host,
+            database=db_name,
+            user=db_user,
+            password=db_password
+        )
+        return conn
+
+
+    query = """
+        SELECT *
+        FROM company.matches
+        WHERE "date" = (SELECT date
+                        FROM company.matches
+                        WHERE "date" > CURRENT_TIMESTAMP 
+                        ORDER BY "date" ASC
+                        LIMIT 1);
+
+        """
+
+    connection = connect_to_database()
+
+    cursor = connection.cursor()
+
+
+    cursor.execute(query)
+    res = cursor.fetchall()
+
+
+    print(res)
+    
+    connection.commit()
+    cursor.close()
+
+    if len(res) != 0:
+        payload = ""
+        
+        for row in res:
+            payload = str(row) + "<br>" + payload
+            
+        client = Courier(auth_token="pk_prod_41XEG71BC44ZBWQ5813QAAF0EJKY")
+
+        resp = client.send_message(
+            message={
+                "to": {"email": receiver},
+                "template": "3GFKE3E9564M62GCSA5M3F8F499H",
+                "data": {
+                    "data": payload,
+                },
+            }
+        )
+        
+        return {"message": "Notification sent"}
+
 
 
 if __name__ == "__main__":
