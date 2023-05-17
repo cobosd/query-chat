@@ -148,15 +148,14 @@ def notify():
     from trycourier import Courier
     import psycopg2
 
-    receiver = 'dnazarioc@gmail.com'
+    receiver = os.getenv('EMAIL_RECEIVER')
 
     # Database connection details
-    db_host = "goldengoal.ch4xk7wsawcj.us-east-1.rds.amazonaws.com"
+    db_host = os.getenv('DB_HOST')
     db_port = 5432
-    # db_name = "postgres"
-    db_name = "goldengoal_db"
-    db_user = "postgres"
-    db_password = "vhq_5101"
+    db_name = os.getenv('DB_NAME')
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASS')
 
 
     def connect_to_database():

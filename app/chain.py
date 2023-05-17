@@ -45,7 +45,7 @@ def sql_agent(file_path, model):
     print("API KEY IS:", api_key)
 
     llm = OpenAI(temperature=0, openai_api_key=api_key,
-                 model_name="gpt-3.5-turbo")
+                    model_name="gpt-3.5-turbo")
 
     print("OPENAI HAS BEEN INITIALIZED")
 
